@@ -33,4 +33,30 @@ const createUser = async (req, res) => {
     return res.status(500).json({ msg: "Unable to create new User", error: error.message });
   }
 };
-module.exports = {createProfile,createUser}
+
+
+const createUserWithProfile = async(req,res)=>{
+    try {
+    const { name, email, bio, website } = req.body;
+     const newProfile= new Profile({ bio, website });
+    const savedProfile = await newProfile.save();
+    const user = new User({
+      name,
+      email,
+      profile: savedProfile._id
+    });
+    await user.save();
+
+    savedProfile.user = user._id;
+    await savedProfile.save();
+
+    res.status(201).json({ msg: "User and Profile created successfully.", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Something went wrong", error });
+  }
+
+}
+
+
+module.exports = {createUserWithProfile}
