@@ -4,7 +4,7 @@ const User = require('../models/user');
 const createUserWithProfile = async(req,res)=>{
     try {
     const { name, email, bio, website } = req.body;
-     const newProfile= new Profile({ bio, website });
+    const newProfile= new Profile({ bio, website });
     const savedProfile = await newProfile.save();
     const user = new User({
       name,
@@ -24,5 +24,42 @@ const createUserWithProfile = async(req,res)=>{
 
 }
 
+const UpdateUserandProfile = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, bio, website } = req.body;
 
-module.exports = {createUserWithProfile}
+    const user = await User.findById(id).populate('profile');
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+
+    user.name = name;
+    user.email = email;
+    await user.save();
+
+
+    const profile = await Profile.findById(user.profile._id);
+    if (!profile) {
+      return res.status(404).json({ msg: "Profile not found" });
+    }
+
+    profile.bio = bio;
+    profile.website = website;
+    await profile.save();
+
+    const updatedUser = await User.findById(id).populate('profile');
+
+    res.status(200).json({
+      msg: "User and Profile updated successfully!",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Something went wrong", error });
+  }
+};
+
+
+module.exports = {createUserWithProfile,UpdateUserandProfile}
