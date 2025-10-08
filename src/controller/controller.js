@@ -29,31 +29,29 @@ const UpdateUserandProfile = async (req, res) => {
     const { id } = req.params;
     const { name, email, bio, website } = req.body;
 
-    const user = await User.findById(id).populate('profile');
-    if (!user) {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { name, email },
+      { new: true } 
+    ).populate('profile');
+
+    if (!updatedUser) {
       return res.status(404).json({ msg: "User not found" });
     }
 
-
-    user.name = name;
-    user.email = email;
-    await user.save();
-
-
-    const profile = await Profile.findById(user.profile._id);
-    if (!profile) {
-      return res.status(404).json({ msg: "Profile not found" });
+    if (updatedUser.profile) {
+      await Profile.findByIdAndUpdate(
+        updatedUser.profile._id,
+        { bio, website },
+        { new: true }
+      );
     }
 
-    profile.bio = bio;
-    profile.website = website;
-    await profile.save();
-
-    const updatedUser = await User.findById(id).populate('profile');
+    const finalUser = await User.findById(id).populate('profile');
 
     res.status(200).json({
       msg: "User and Profile updated successfully!",
-      user: updatedUser,
+      user: finalUser,
     });
   } catch (error) {
     console.error(error);
