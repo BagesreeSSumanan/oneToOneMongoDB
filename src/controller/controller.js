@@ -1,5 +1,6 @@
 const Profile = require('../models/profile');
 const User = require('../models/user');
+const logger = require('../logger/logger');
 
 const createUserWithProfile = async(req,res)=>{
     try {
@@ -17,8 +18,10 @@ const createUserWithProfile = async(req,res)=>{
     await savedProfile.save();
 
     res.status(201).json({ msg: "User and Profile created successfully.", user });
+    logger.info(`User and Profile created successfully`);
   } catch (error) {
     console.error(error);
+     logger.error(`error in create user ${error}`);
     res.status(500).json({ msg: "Something went wrong", error });
   }
 

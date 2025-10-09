@@ -1,4 +1,5 @@
 const { body, validationResult } = require("express-validator");
+
 const userValidationRules = () => {
   return [
     // username must be an email

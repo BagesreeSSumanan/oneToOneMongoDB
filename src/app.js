@@ -2,6 +2,7 @@ const express = require('express');
 const mongoos = require('mongoose');
 const bodyParser = require('body-parser');
 const config = require('./config/config');
+const logger = require('./logger/logger');
 
 const app = express();
 app.use(express.json());
@@ -27,4 +28,5 @@ const connectToDB = async() =>{
 connectToDB();
 app.listen(PORT,()=>{
  console.log(`Example app listening on port ${PORT}`);
+ logger.info(`Server listening on port ${PORT}`);
 });
